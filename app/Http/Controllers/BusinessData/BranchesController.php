@@ -104,12 +104,12 @@ class BranchesController extends Controller
             }
         }
 
-        if ($request->file('images') && !empty($request->logo)) {
+        if ($request->file('images') && !empty($request->images)) {
             foreach ($request->file('images') as $key => $file) {
-                $name = time() . '.' . $file->getClientOriginalExtension();
+                $name = \Str::random().time() . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('public/branch-images', $name);
                 $path = 'branch-images/' . $name;
-                $branch->images()->create(['image_path', $path]);
+                $branch->images()->create(['image_path' => $path]);
             }
         }
         return redirect()->intended(route('businesses.show', $business->id));
@@ -124,8 +124,8 @@ class BranchesController extends Controller
      */
     public function show($id)
     {
-        $business = Business::with(['branches'])->findOrFail($id);
-        return view('business-data.businesses.show', compact('business'));
+        $branch = Branch::with(['images','workingWeekDays' => fn ($q) => $q->with('timings')])->findOrFail($id);
+        return view('business-data.branches.show', compact('branch'));
     }
 
     /**
@@ -134,7 +134,7 @@ class BranchesController extends Controller
      */
     public function destroy($id)
     {
-        Business::destroy($id);
-        return redirect()->intended(route('businesses.index'));
+        Branch::destroy($id);
+        return redirect()->back();
     }
 }

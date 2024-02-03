@@ -13,4 +13,13 @@ class BranchImage extends Model
         'branch_id',
         'image_path',
     ];
+
+    /**
+     * Get business image // image
+     *
+     */
+    public function getImageAttribute()
+    {
+        return !empty($this->image_path) ? url('/storage/' . $this->image_path) : null;
+    }
 }
